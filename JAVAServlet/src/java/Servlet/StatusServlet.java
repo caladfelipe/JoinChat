@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 
-public class EliminarServlet extends HttpServlet {
+public class StatusServlet extends HttpServlet {
 
 public void doPost(HttpServletRequest request, HttpServletResponse response)
                                  throws ServletException, IOException{
@@ -21,11 +21,18 @@ public void doPost(HttpServletRequest request, HttpServletResponse response)
     Connection connection;
     try{
       String name = request.getParameter("username");
+      String status = request.getParameter("status");
+
        
       Class.forName("com.mysql.jdbc.Driver");
       connection = DriverManager.getConnection(connectionURL, "root", "2403");
-      PreparedStatement pst = connection.prepareStatement("delete from Usuarios where usuario=?");
-      pst.setString(1,name);
+      
+      
+      PreparedStatement pst = connection.prepareStatement("update Usuarios set status=? where usuario=?");
+      pst.setString(1,status);
+      pst.setString(2,name);
+
+     
  
       int i = pst.executeUpdate();
       if(i!=0){
@@ -33,24 +40,26 @@ public void doPost(HttpServletRequest request, HttpServletResponse response)
        if (format.equals("json")) {
                 JSONObject json = new JSONObject();
                 json.put("success", true);
-                json.put("message","Usuario Eliminado");
+                json.put("message","Datos Actualizados");
                 pw.print(json);
             }
                  
       }
       else{
-         String format = request.getParameter("format");
+        String format = request.getParameter("format");
             if (format.equals("json")) {
                 JSONObject json = new JSONObject();
                 json.put("success", false);
-                json.put("message","Error al Eliminar");
+                json.put("message","Error al actualizar");
                 pw.print(json);
        }
+       }
+    
+      
     }
-    }catch (Exception e){
+    catch (Exception e){
       pw.println(e);
     }
     pw.close();
   }
 }
-
